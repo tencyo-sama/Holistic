@@ -4,12 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Holistic Tracking</title>
-  <!-- async 属性を削除 -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
   <style>
-    /* ハンドジェスチャーコードと同じスタイル */
     body {
       margin: 0;
       padding: 0;
@@ -92,16 +90,10 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // 定数をwindowオブジェクトから取得
-    const POSE_CONNECTIONS = window.POSE_CONNECTIONS;
-    const HAND_CONNECTIONS = window.HAND_CONNECTIONS;
-    const FACEMESH_TESSELATION = window.FACEMESH_TESSELATION;
-    const FACEMESH_FACE_OVAL = window.FACEMESH_FACE_OVAL;
-
     const holistic = new Holistic({
-        locateFile: (file) => {
-            return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
-        }
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+      }
     });
 
     holistic.setOptions({
@@ -110,7 +102,7 @@
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
       refineFaceLandmarks: true,
-      enableSegmentation: false // セグメンテーションを無効化
+      enableSegmentation: false
     });
 
     const camera = new Camera(video, {
@@ -119,16 +111,13 @@
       },
       width: 1280,
       height: 720,
-      facingMode: 'environment' // 背面カメラを使用
+      facingMode: 'environment'
     });
 
     holistic.onResults(results => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-      
-      // resultsオブジェクトの確認
-      // console.log(results);
-      
+
       if (results.poseLandmarks) {
         drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
         drawLandmarks(ctx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2, radius: 5 });

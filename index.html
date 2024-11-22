@@ -4,9 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Holistic Tracking</title>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" async></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" async></script>
+  <!-- async 属性を削除 -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
   <style>
     /* ハンドジェスチャーコードと同じスタイル */
     body {
@@ -91,6 +92,12 @@
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // 定数をwindowオブジェクトから取得
+    const POSE_CONNECTIONS = window.POSE_CONNECTIONS;
+    const HAND_CONNECTIONS = window.HAND_CONNECTIONS;
+    const FACEMESH_TESSELATION = window.FACEMESH_TESSELATION;
+    const FACEMESH_FACE_OVAL = window.FACEMESH_FACE_OVAL;
+
     const holistic = new Holistic({
         locateFile: (file) => {
             return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
@@ -120,7 +127,7 @@
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
       
       // resultsオブジェクトの確認
-      console.log(results);
+      // console.log(results);
       
       if (results.poseLandmarks) {
         drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });

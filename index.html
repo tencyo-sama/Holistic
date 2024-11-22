@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Holistic Tracking</title>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" async></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" async></script>
   <style>
     /* ハンドジェスチャーコードと同じスタイル */
     body {
@@ -83,70 +83,64 @@
     const messageDiv = document.getElementById('message');
     const ctx = canvas.getContext('2d');
 
-    // キャンバスのサイズをウィンドウに合わせる
     function resizeCanvas() {
       const container = document.querySelector('.container');
       canvas.width = container.clientWidth;
       canvas.height = container.clientHeight;
     }
-
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Holisticの設定
     const holistic = new Holistic({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
-      }
+        locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`;
+        }
     });
 
     holistic.setOptions({
       modelComplexity: 1,
       smoothLandmarks: true,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
-      refineFaceLandmarks: true // 顔のランドマークをより正確に検出
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+      refineFaceLandmarks: true,
+      enableSegmentation: false // セグメンテーションを無効化
     });
 
-    // カメラの設定 (背面カメラを使用)
     const camera = new Camera(video, {
       onFrame: async () => {
         await holistic.send({ image: video });
       },
       width: 1280,
       height: 720,
-      facingMode: 'environment'
+      facingMode: 'environment' // 背面カメラを使用
     });
 
-    // 定数の定義を追加
-    const POSE_CONNECTIONS = window.POSE_CONNECTIONS;
-    const HAND_CONNECTIONS = window.HAND_CONNECTIONS;
-    const FACEMESH_TESSELATION = window.FACEMESH_TESSELATION;
-    const FACEMESH_FACE_OVAL = window.FACEMESH_FACE_OVAL;
-
-    // 検出結果の処理
     holistic.onResults(results => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
-
-      // ポーズの描画
-      drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
-      drawLandmarks(ctx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2, radius: 5 });
-
-      // 左手の描画
-      drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#FF0000', lineWidth: 4 });
-      drawLandmarks(ctx, results.leftHandLandmarks, { color: '#00FF00', lineWidth: 2, radius: 5 });
-
-      // 右手の描画
-      drawConnectors(ctx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#0000FF', lineWidth: 4 });
-      drawLandmarks(ctx, results.rightHandLandmarks, { color: '#FFFF00', lineWidth: 2, radius: 5 });
-
-      // 顔の描画
-      drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, { color: '#C0C0C070', lineWidth: 1 });
-      drawConnectors(ctx, results.faceLandmarks, FACEMESH_FACE_OVAL, { color: '#E0E0E0' });
+      
+      // resultsオブジェクトの確認
+      console.log(results);
+      
+      if (results.poseLandmarks) {
+        drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: '#00FF00', lineWidth: 4 });
+        drawLandmarks(ctx, results.poseLandmarks, { color: '#FF0000', lineWidth: 2, radius: 5 });
+      }
+      if (results.leftHandLandmarks) {
+        drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, { color: '#FF0000', lineWidth: 4 });
+        drawLandmarks(ctx, results.leftHandLandmarks, { color: '#00FF00', lineWidth: 2, radius: 5 });
+      }
+      if (results.rightHandLandmarks) {
+        drawConnectors(ctx, results.rightHandLandmarks, HAND_CONNECTIONS, { color: '#0000FF', lineWidth: 4 });
+        drawLandmarks(ctx, results.rightHandLandmarks, { color: '#FFFF00', lineWidth: 2, radius: 5 });
+      }
+      if (results.faceLandmarks) {
+        drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, { color: '#C0C0C070', lineWidth: 1 });
+        drawConnectors(ctx, results.faceLandmarks, FACEMESH_FACE_OVAL, { color: '#E0E0E0' });
+      }
     });
 
-    // 開始/停止ボタンの処理、エラーハンドリングはハンドジェスチャーコードと同じ
+      // 開始/停止ボタンの処理、エラーハンドリングはハンドジェスチャーコードと同じ
     document.getElementById('start').addEventListener('click', () => {
       console.log('Start button clicked');
       messageDiv.textContent = 'カメラを起動中...';

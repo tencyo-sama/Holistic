@@ -118,6 +118,12 @@
       facingMode: 'environment'
     });
 
+    // 定数の定義を追加
+    const POSE_CONNECTIONS = window.POSE_CONNECTIONS;
+    const HAND_CONNECTIONS = window.HAND_CONNECTIONS;
+    const FACEMESH_TESSELATION = window.FACEMESH_TESSELATION;
+    const FACEMESH_FACE_OVAL = window.FACEMESH_FACE_OVAL;
+
     // 検出結果の処理
     holistic.onResults(results => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
